@@ -1,0 +1,29 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+-- ----------------------------------------------------
+-- ระบบชื่อสายรุ้งบนหัว (Brookhaven Rainbow Name Only)
+-- ----------------------------------------------------
+task.spawn(function()
+    while true do
+        RunService.RenderStepped:Wait()
+        local character = LocalPlayer.Character
+        if character then
+            local head = character:FindFirstChild("Head")
+            if head then
+                -- ค้นหาป้ายชื่อ RP บนหัวตัวละครใน Brookhaven
+                for _, v in ipairs(head:GetChildren()) do
+                    if v:IsA("BillboardGui") then
+                        for _, label in ipairs(v:GetDescendants()) do
+                            if label:IsA("TextLabel") then
+                                local hue = (tick() % 3) / 3
+                                label.TextColor3 = Color3.fromHSV(hue, 1, 1)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
