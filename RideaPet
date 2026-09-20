@@ -1,572 +1,131 @@
--- [[ NOVA Hub - Ride a Pet (Match Text & UI Fixed) ]]
+-- [[ NOVA Hub - Custom UI Edition ]]
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local TeleportService = game:GetService("TeleportService")
-local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 
-local CORRECT_KEY = "NOVA-KEY-2026"
-local DISCORD_LINK = "https://discord.gg/DK3DpWwgr"
+local DISCORD_LINK = "https://discord.gg/678vek3Jh"
+local SHORT_DISCORD_LINK = "discord.gg/678vek3Jh"
 
+-- Safe GUI Parent Setup
 local ParentTarget
-local success, _ = pcall(function()
+pcall(function()
     ParentTarget = game:GetService("CoreGui")
 end)
-if not success or not ParentTarget then
+if not ParentTarget then
     ParentTarget = LocalPlayer:WaitForChild("PlayerGui")
 end
 
-if ParentTarget:FindFirstChild("NOVA_Hub_UI") then
-    ParentTarget.NOVA_Hub_UI:Destroy()
+-- Clear Old UI
+if ParentTarget:FindFirstChild("NOVA_Hub_CustomUI") then
+    ParentTarget.NOVA_Hub_CustomUI:Destroy()
 end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "NOVA_Hub_UI"
+ScreenGui.Name = "NOVA_Hub_CustomUI"
 ScreenGui.ResetOnSpawn = false
+pcall(function() ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling end)
 ScreenGui.Parent = ParentTarget
 
 ---------------------------------------------------------
--- TOGGLE BUTTON (สี่เหลี่ยมเล็ก พื้นหลังขาว ขอบฟ้า ตัว N)
----------------------------------------------------------
-local ToggleBtn = Instance.new("TextButton")
-ToggleBtn.Name = "ToggleBtn"
-ToggleBtn.Size = UDim2.new(0, 40, 0, 40)
-ToggleBtn.Position = UDim2.new(0.02, 0, 0.4, 0)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ToggleBtn.Text = "N"
-ToggleBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
-ToggleBtn.TextSize = 22
-ToggleBtn.Font = Enum.Font.SourceSansBold
-ToggleBtn.Active = true
-ToggleBtn.Draggable = true
-ToggleBtn.Visible = false
-ToggleBtn.Parent = ScreenGui
-
-local ToggleCorner = Instance.new("UICorner")
-ToggleCorner.CornerRadius = UDim.new(0, 8)
-ToggleCorner.Parent = ToggleBtn
-
-local ToggleStroke = Instance.new("UIStroke")
-ToggleStroke.Color = Color3.fromRGB(0, 170, 255)
-ToggleStroke.Thickness = 2
-ToggleStroke.Parent = ToggleBtn
-
----------------------------------------------------------
--- 1. KEY SYSTEM
+-- MAIN KEY FRAME (White Background + Blue Border)
 ---------------------------------------------------------
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Name = "KeyFrame"
-KeyFrame.Size = UDim2.new(0, 340, 0, 230)
-KeyFrame.Position = UDim2.new(0.5, -170, 0.5, -115)
-KeyFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+KeyFrame.Size = UDim2.new(0, 360, 0, 240)
+KeyFrame.Position = UDim2.new(0.5, -180, 0.5, -120)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- พื้นหลังสีขาว
 KeyFrame.Active = true
 KeyFrame.Draggable = true
 KeyFrame.Parent = ScreenGui
 
 local KeyStroke = Instance.new("UIStroke")
-KeyStroke.Color = Color3.fromRGB(0, 170, 255)
-KeyStroke.Thickness = 2
+KeyStroke.Color = Color3.fromRGB(0, 170, 255) -- ขอบสีฟ้า
+KeyStroke.Thickness = 2.5
 KeyStroke.Parent = KeyFrame
 
 local KeyCorner = Instance.new("UICorner")
 KeyCorner.CornerRadius = UDim.new(0, 10)
 KeyCorner.Parent = KeyFrame
 
+-- Title Text: • NOVA Hub - [⏳]
 local KeyTitle = Instance.new("TextLabel")
-KeyTitle.Size = UDim2.new(1, 0, 0, 40)
+KeyTitle.Size = UDim2.new(1, 0, 0, 35)
+KeyTitle.Position = UDim2.new(0, 0, 0, 10)
 KeyTitle.BackgroundTransparency = 1
-KeyTitle.Text = "🔑 ระบบยืนยัน Key"
+KeyTitle.Text = "• NOVA Hub - [⏳]"
 KeyTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
 KeyTitle.TextSize = 18
 KeyTitle.Font = Enum.Font.SourceSansBold
 KeyTitle.Parent = KeyFrame
 
+-- Discord Small Link Text
+local DiscSubText = Instance.new("TextLabel")
+DiscSubText.Size = UDim2.new(1, 0, 0, 18)
+DiscSubText.Position = UDim2.new(0, 0, 0, 42)
+DiscSubText.BackgroundTransparency = 1
+DiscSubText.Text = DISCORD_LINK
+DiscSubText.TextColor3 = Color3.fromRGB(150, 150, 150)
+DiscSubText.TextSize = 11 -- ตัวเล็กๆ
+DiscSubText.Font = Enum.Font.SourceSans
+DiscSubText.Parent = KeyFrame
+
+-- Key Input Box (Gray Background)
 local KeyBox = Instance.new("TextBox")
-KeyBox.Size = UDim2.new(0.85, 0, 0, 38)
-KeyBox.Position = UDim2.new(0.075, 0, 0.22, 0)
-KeyBox.BackgroundColor3 = Color3.fromRGB(235, 235, 235)
-KeyBox.PlaceholderText = "กรอก Key เพื่อเข้าใช้งาน..."
+KeyBox.Size = UDim2.new(0.85, 0, 0, 40)
+KeyBox.Position = UDim2.new(0.075, 0, 0.32, 0)
+KeyBox.BackgroundColor3 = Color3.fromRGB(230, 230, 230) -- ช่องเทาๆ
+KeyBox.PlaceholderText = "[ 🔒 ] Key.."
+KeyBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
 KeyBox.Text = ""
-KeyBox.TextColor3 = Color3.fromRGB(30, 30, 30)
+KeyBox.TextColor3 = Color3.fromRGB(255, 0, 0) -- ตัวหนังสือสีแดง
 KeyBox.TextSize = 15
-KeyBox.Font = Enum.Font.SourceSans
+KeyBox.Font = Enum.Font.SourceSansBold
 KeyBox.Parent = KeyFrame
 
 local BoxCorner = Instance.new("UICorner")
-BoxCorner.CornerRadius = UDim.new(0, 6)
+BoxCorner.CornerRadius = UDim.new(0, 8)
 BoxCorner.Parent = KeyBox
 
-local RunBtn = Instance.new("TextButton")
-RunBtn.Size = UDim2.new(0.85, 0, 0, 35)
-RunBtn.Position = UDim2.new(0.075, 0, 0.43, 0)
-RunBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
-RunBtn.Text = "เข้าสู่ระบบ"
-RunBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-RunBtn.TextSize = 16
-RunBtn.Font = Enum.Font.SourceSansBold
-RunBtn.Parent = KeyFrame
-
-local RunCorner = Instance.new("UICorner")
-RunCorner.CornerRadius = UDim.new(0, 6)
-RunCorner.Parent = RunBtn
-
-local DiscordBtn = Instance.new("TextButton")
-DiscordBtn.Size = UDim2.new(0.85, 0, 0, 35)
-DiscordBtn.Position = UDim2.new(0.075, 0, 0.62, 0)
-DiscordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-DiscordBtn.Text = "💬 ก๊อปปี้ลิงก์ Discord (ขอ Key แอดมิน)"
-DiscordBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-DiscordBtn.TextSize = 13
-DiscordBtn.Font = Enum.Font.SourceSansBold
-DiscordBtn.Parent = KeyFrame
-
-local DiscCorner = Instance.new("UICorner")
-DiscCorner.CornerRadius = UDim.new(0, 6)
-DiscCorner.Parent = DiscordBtn
-
-DiscordBtn.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(DISCORD_LINK)
-        DiscordBtn.Text = "✅ ก๊อปปี้ลิงก์เรียบร้อย!"
-        task.wait(1.5)
-        DiscordBtn.Text = "💬 ก๊อปปี้ลิงก์ Discord (ขอ Key แอดมิน)"
-    end
+-- แจ้งเตือนเมื่อกดใส่ Key
+KeyBox.Focused:Connect(function()
+    KeyBox.Text = "Script อัพเกมแล้ว!"
 end)
 
----------------------------------------------------------
--- 2. MAIN MENU UI
----------------------------------------------------------
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 500, 0, 340)
-MainFrame.Position = UDim2.new(0.5, -250, 0.5, -170)
-MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.Visible = false
-MainFrame.Parent = ScreenGui
+-- Green Follow Script Button
+local FollowBtn = Instance.new("TextButton")
+FollowBtn.Size = UDim2.new(0.85, 0, 0, 42)
+FollowBtn.Position = UDim2.new(0.075, 0, 0.60, 0)
+FollowBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113) -- ปุ่มสีเขียว
+FollowBtn.Text = "ติดตาม Script.."
+FollowBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FollowBtn.TextSize = 16
+FollowBtn.Font = Enum.Font.SourceSansBold
+FollowBtn.Parent = KeyFrame
 
-local MainStroke = Instance.new("UIStroke")
-MainStroke.Color = Color3.fromRGB(0, 170, 255)
-MainStroke.Thickness = 2
-MainStroke.Parent = MainFrame
+local FollowCorner = Instance.new("UICorner")
+FollowCorner.CornerRadius = UDim.new(0, 8)
+FollowCorner.Parent = FollowBtn
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 10)
-MainCorner.Parent = MainFrame
+-- Custom Notification Box
+local NotifyLabel = Instance.new("TextLabel")
+NotifyLabel.Size = UDim2.new(0.85, 0, 0, 20)
+NotifyLabel.Position = UDim2.new(0.075, 0, 0.83, 0)
+NotifyLabel.BackgroundTransparency = 1
+NotifyLabel.Text = ""
+NotifyLabel.TextColor3 = Color3.fromRGB(46, 204, 113)
+NotifyLabel.TextSize = 13
+NotifyLabel.Font = Enum.Font.SourceSansBold
+NotifyLabel.Parent = KeyFrame
 
-local TopBar = Instance.new("Frame")
-TopBar.Size = UDim2.new(1, 0, 0, 40)
-TopBar.BackgroundTransparency = 1
-TopBar.Parent = MainFrame
-
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(0.7, 0, 1, 0)
-TitleLabel.Position = UDim2.new(0.03, 0, 0, 0)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text = "• NOVA Hub - ขี่สัตว์เลี้ยง"
-TitleLabel.TextColor3 = Color3.fromRGB(0, 170, 255)
-TitleLabel.TextSize = 18
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.Font = Enum.Font.SourceSansBold
-TitleLabel.Parent = TopBar
-
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-CloseBtn.Position = UDim2.new(1, -35, 0, 5)
-CloseBtn.BackgroundTransparency = 1
-CloseBtn.Text = "❌"
-CloseBtn.TextSize = 16
-CloseBtn.Parent = TopBar
-
--- Sidebar
-local SideBar = Instance.new("Frame")
-SideBar.Size = UDim2.new(0, 130, 1, -40)
-SideBar.Position = UDim2.new(0, 0, 0, 40)
-SideBar.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
-SideBar.BorderSizePixel = 0
-SideBar.Parent = MainFrame
-
-local SideCorner = Instance.new("UICorner")
-SideCorner.CornerRadius = UDim.new(0, 10)
-SideCorner.Parent = SideBar
-
-local SideList = Instance.new("UIListLayout")
-SideList.Parent = SideBar
-SideList.SortOrder = Enum.SortOrder.LayoutOrder
-SideList.Padding = UDim.new(0, 5)
-
-local TabMainBtn = Instance.new("TextButton")
-TabMainBtn.Size = UDim2.new(1, 0, 0, 40)
-TabMainBtn.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
-TabMainBtn.Text = "🏡 หน้าหลัก"
-TabMainBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
-TabMainBtn.TextSize = 15
-TabMainBtn.Font = Enum.Font.SourceSansBold
-TabMainBtn.Parent = SideBar
-
-local TabESPBtn = Instance.new("TextButton")
-TabESPBtn.Size = UDim2.new(1, 0, 0, 40)
-TabESPBtn.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
-TabESPBtn.Text = "🛡️ ระบบ"
-TabESPBtn.TextColor3 = Color3.fromRGB(100, 100, 100)
-TabESPBtn.TextSize = 15
-TabESPBtn.Font = Enum.Font.SourceSansBold
-TabESPBtn.Parent = SideBar
-
--- Container
-local Container = Instance.new("Frame")
-Container.Size = UDim2.new(1, -140, 1, -50)
-Container.Position = UDim2.new(0, 135, 0, 45)
-Container.BackgroundTransparency = 1
-Container.Parent = MainFrame
-
--- Tab 1
-local MainScroll = Instance.new("ScrollingFrame")
-MainScroll.Size = UDim2.new(1, 0, 1, 0)
-MainScroll.BackgroundTransparency = 1
-MainScroll.BorderSizePixel = 0
-MainScroll.CanvasSize = UDim2.new(0, 0, 0, 300)
-MainScroll.ScrollBarThickness = 4
-MainScroll.Visible = true
-MainScroll.Parent = Container
-
-local MainList = Instance.new("UIListLayout")
-MainList.Parent = MainScroll
-MainList.SortOrder = Enum.SortOrder.LayoutOrder
-MainList.Padding = UDim.new(0, 10)
-
--- Tab 2
-local ESPScroll = Instance.new("ScrollingFrame")
-ESPScroll.Size = UDim2.new(1, 0, 1, 0)
-ESPScroll.BackgroundTransparency = 1
-ESPScroll.BorderSizePixel = 0
-ESPScroll.CanvasSize = UDim2.new(0, 0, 0, 350)
-ESPScroll.ScrollBarThickness = 4
-ESPScroll.Visible = false
-ESPScroll.Parent = Container
-
-local ESPList = Instance.new("UIListLayout")
-ESPList.Parent = ESPScroll
-ESPList.SortOrder = Enum.SortOrder.LayoutOrder
-ESPList.Padding = UDim.new(0, 10)
-
-TabMainBtn.MouseButton1Click:Connect(function()
-    MainScroll.Visible = true
-    ESPScroll.Visible = false
-    TabMainBtn.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
-    TabMainBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
-    TabESPBtn.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
-    TabESPBtn.TextColor3 = Color3.fromRGB(100, 100, 100)
-end)
-
-TabESPBtn.MouseButton1Click:Connect(function()
-    MainScroll.Visible = false
-    ESPScroll.Visible = true
-    TabESPBtn.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
-    TabESPBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
-    TabMainBtn.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
-    TabMainBtn.TextColor3 = Color3.fromRGB(100, 100, 100)
-end)
-
----------------------------------------------------------
--- 3. หน้าหลัก
----------------------------------------------------------
-local CustomSpeed = 16
-local SpeedToggle = false
-
-local SpeedFrame = Instance.new("Frame")
-SpeedFrame.Size = UDim2.new(0.95, 0, 0, 40)
-SpeedFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-SpeedFrame.Parent = MainScroll
-
-local SpeedFrameCorner = Instance.new("UICorner")
-SpeedFrameCorner.CornerRadius = UDim.new(0, 6)
-SpeedFrameCorner.Parent = SpeedFrame
-
-local SpeedBtn = Instance.new("TextButton")
-SpeedBtn.Size = UDim2.new(0.6, 0, 1, 0)
-SpeedBtn.BackgroundTransparency = 1
-SpeedBtn.Text = "⚡ วิ่งเร็ว : [ ปิด ]"
-SpeedBtn.TextColor3 = Color3.fromRGB(50, 50, 50)
-SpeedBtn.TextSize = 13
-SpeedBtn.Font = Enum.Font.SourceSansBold
-SpeedBtn.Parent = SpeedFrame
-
-local SpeedInput = Instance.new("TextBox")
-SpeedInput.Size = UDim2.new(0.35, 0, 0.7, 0)
-SpeedInput.Position = UDim2.new(0.62, 0, 0.15, 0)
-SpeedInput.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-SpeedInput.Text = "100"
-SpeedInput.PlaceholderText = "1-1000"
-SpeedInput.TextColor3 = Color3.fromRGB(0, 170, 255)
-SpeedInput.TextSize = 14
-SpeedInput.Font = Enum.Font.SourceSansBold
-SpeedInput.Parent = SpeedFrame
-
-local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 4)
-InputCorner.Parent = SpeedInput
-
-SpeedInput.FocusLost:Connect(function()
-    local val = tonumber(SpeedInput.Text)
-    if val then
-        CustomSpeed = math.clamp(val, 1, 1000)
-        SpeedInput.Text = tostring(CustomSpeed)
-    else
-        SpeedInput.Text = tostring(CustomSpeed)
-    end
-end)
-
-SpeedBtn.MouseButton1Click:Connect(function()
-    SpeedToggle = not SpeedToggle
-    SpeedBtn.Text = SpeedToggle and "⚡ วิ่งเร็ว : [ เปิด ]" or "⚡ วิ่งเร็ว : [ ปิด ]"
-    SpeedFrame.BackgroundColor3 = SpeedToggle and Color3.fromRGB(200, 245, 210) or Color3.fromRGB(240, 240, 240)
-end)
-
-local JumpBtn = Instance.new("TextButton")
-JumpBtn.Size = UDim2.new(0.95, 0, 0, 38)
-JumpBtn.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-JumpBtn.Text = "🦘 กระโดดสูง : [ ปิด ]"
-JumpBtn.TextColor3 = Color3.fromRGB(50, 50, 50)
-JumpBtn.TextSize = 14
-JumpBtn.Font = Enum.Font.SourceSansBold
-JumpBtn.Parent = MainScroll
-
-local JumpToggle = false
-JumpBtn.MouseButton1Click:Connect(function()
-    JumpToggle = not JumpToggle
-    JumpBtn.Text = JumpToggle and "🦘 กระโดดสูง (120) : [ เปิด ]" or "🦘 กระโดดสูง : [ ปิด ]"
-    JumpBtn.BackgroundColor3 = JumpToggle and Color3.fromRGB(200, 245, 210) or Color3.fromRGB(240, 240, 240)
-end)
-
-RunService.Stepped:Connect(function()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        local hum = LocalPlayer.Character.Humanoid
-        if SpeedToggle then hum.WalkSpeed = CustomSpeed else hum.WalkSpeed = 16 end
-        if JumpToggle then hum.JumpPower = 120 else hum.JumpPower = 50 end
-    end
-end)
-
----------------------------------------------------------
--- 4. เมนูระบบ (ESP หลุมดำ + ESP ไข่เชอรูบ)
----------------------------------------------------------
-local ESP_Blackhole_Active = false
-local ESP_Cherub_Active = false
-
-local ESP_Folder = Instance.new("Folder")
-ESP_Folder.Name = "NOVA_ESP_Holder"
-ESP_Folder.Parent = ParentTarget
-
-local function CreateESPLabel(targetPart, text, textColor)
-    if not targetPart or not targetPart.Parent then return end
-    
-    local tagID = "ESP_Tag_" .. targetPart:GetDebugId()
-    if ESP_Folder:FindFirstChild(tagID) then return end
-
-    local bb = Instance.new("BillboardGui")
-    bb.Name = tagID
-    bb.Adornee = targetPart
-    bb.Size = UDim2.new(0, 300, 0, 70)
-    bb.AlwaysOnTop = true
-    bb.ExtentsOffset = Vector3.new(0, 4, 0)
-    bb.Parent = ESP_Folder
-
-    local dLbl = Instance.new("TextLabel")
-    dLbl.Name = "DistLbl"
-    dLbl.Size = UDim2.new(1, 0, 0.3, 0)
-    dLbl.BackgroundTransparency = 1
-    dLbl.Text = "[Calculating...]"
-    dLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-    dLbl.TextSize = 14
-    dLbl.Font = Enum.Font.SourceSansBold
-    dLbl.Parent = bb
-
-    local nLbl = Instance.new("TextLabel")
-    nLbl.Size = UDim2.new(1, 0, 0.7, 0)
-    nLbl.Position = UDim2.new(0, 0, 0.3, 0)
-    nLbl.BackgroundTransparency = 1
-    nLbl.Text = text
-    nLbl.TextColor3 = textColor
-    nLbl.TextSize = 22
-    nLbl.Font = Enum.Font.SourceSansBold
-    nLbl.Parent = bb
-
-    local s2 = Instance.new("UIStroke")
-    s2.Color = Color3.fromRGB(0, 0, 0)
-    s2.Thickness = 3
-    s2.Parent = nLbl
-
-    task.spawn(function()
-        while bb and bb.Parent and targetPart and targetPart.Parent do
-            local char = LocalPlayer.Character
-            local hrp = char and char:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                local dist = math.floor((hrp.Position - targetPart.Position).Magnitude)
-                dLbl.Text = "[" .. tostring(dist) .. " Studs]"
-            end
-            task.wait(0.3)
+-- Action Button Click (Copy Link & Notify)
+FollowBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        if setclipboard then
+            setclipboard(SHORT_DISCORD_LINK)
         end
     end)
-end
-
-local function IsInGarden(instance)
-    local p = instance.Parent
-    while p and p ~= workspace do
-        local pName = p.Name:lower()
-        if pName:find("plot") or pName:find("garden") or pName:find("farm") or pName:find("สวน") or pName:find("player") then
-            return true
-        end
-        p = p.Parent
-    end
-    return false
-end
-
-local function GetTargetPart(inst)
-    if inst:IsA("BasePart") then return inst end
-    if inst:IsA("Model") then
-        if inst.PrimaryPart then return inst.PrimaryPart end
-        return inst:FindFirstChildWhichIsA("BasePart", true)
-    end
-    return nil
-end
-
-local function CheckAndAddESP(v)
-    if not v or IsInGarden(v) then return end
-
-    local n = v.Name:lower()
-    local targetPart = GetTargetPart(v)
-
-    if targetPart then
-        if ESP_Blackhole_Active then
-            if n:find("black") or n:find("hole") or n:find("หลุมดำ") or n:find("void") then
-                CreateESPLabel(targetPart, "ไข่หลุมดำ!", Color3.fromRGB(0, 0, 0))
-            end
-        end
-
-        if ESP_Cherub_Active then
-            if n:find("cherub") or n:find("เชอรูบ") or n:find("1t") or n:find("1 t") or n:find("admin") or n:find("แอดมิน") then
-                CreateESPLabel(targetPart, "ไข่เชอรูบ!", Color3.fromRGB(0, 170, 255))
-            end
-        end
-    end
-end
-
-local function UpdateAllESP()
-    ESP_Folder:ClearAllChildren()
-    if not (ESP_Blackhole_Active or ESP_Cherub_Active) then return end
-
-    for _, v in pairs(workspace:GetDescendants()) do
-        CheckAndAddESP(v)
-    end
-end
-
-workspace.DescendantAdded:Connect(function(v)
-    if ESP_Blackhole_Active or ESP_Cherub_Active then
-        task.wait(0.3)
-        CheckAndAddESP(v)
-    end
-end)
-
--- ปรับข้อความให้มี (ในแมพ) ทั้งคู่ เท่ากันเป๊ะ
-local ESPBlackBtn = Instance.new("TextButton")
-ESPBlackBtn.Size = UDim2.new(0.95, 0, 0, 38)
-ESPBlackBtn.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-ESPBlackBtn.Text = "⚫ ESP ไข่หลุมดำ (ในแมพ) : [ ปิด ]"
-ESPBlackBtn.TextColor3 = Color3.fromRGB(50, 50, 50)
-ESPBlackBtn.TextSize = 13
-ESPBlackBtn.Font = Enum.Font.SourceSansBold
-ESPBlackBtn.Parent = ESPScroll
-
-ESPBlackBtn.MouseButton1Click:Connect(function()
-    ESP_Blackhole_Active = not ESP_Blackhole_Active
-    ESPBlackBtn.Text = ESP_Blackhole_Active and "⚫ ESP ไข่หลุมดำ (ในแมพ) : [ เปิด ]" or "⚫ ESP ไข่หลุมดำ (ในแมพ) : [ ปิด ]"
-    ESPBlackBtn.BackgroundColor3 = ESP_Blackhole_Active and Color3.fromRGB(200, 245, 210) or Color3.fromRGB(240, 240, 240)
-    UpdateAllESP()
-end)
-
-local ESPCherubBtn = Instance.new("TextButton")
-ESPCherubBtn.Size = UDim2.new(0.95, 0, 0, 38)
-ESPCherubBtn.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-ESPCherubBtn.Text = "⚫ ESP ไข่เชอรูบ (ในแมพ) : [ ปิด ]"
-ESPCherubBtn.TextColor3 = Color3.fromRGB(50, 50, 50)
-ESPCherubBtn.TextSize = 13
-ESPCherubBtn.Font = Enum.Font.SourceSansBold
-ESPCherubBtn.Parent = ESPScroll
-
-ESPCherubBtn.MouseButton1Click:Connect(function()
-    ESP_Cherub_Active = not ESP_Cherub_Active
-    ESPCherubBtn.Text = ESP_Cherub_Active and "⚫ ESP ไข่เชอรูบ (ในแมพ) : [ เปิด ]" or "⚫ ESP ไข่เชอรูบ (ในแมพ) : [ ปิด ]"
-    ESPCherubBtn.BackgroundColor3 = ESP_Cherub_Active and Color3.fromRGB(200, 245, 210) or Color3.fromRGB(240, 240, 240)
-    UpdateAllESP()
-end)
-
-local ServerBtn = Instance.new("TextButton")
-ServerBtn.Size = UDim2.new(0.95, 0, 0, 38)
-ServerBtn.BackgroundColor3 = Color3.fromRGB(155, 89, 182)
-ServerBtn.Text = "🚀 ย้ายไปเซิฟเวอร์ 1 คน (แตะเพื่อย้ายทันที)"
-ServerBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ServerBtn.TextSize = 13
-ServerBtn.Font = Enum.Font.SourceSansBold
-ServerBtn.Parent = ESPScroll
-
-local ServerCorner = Instance.new("UICorner")
-ServerCorner.CornerRadius = UDim.new(0, 6)
-ServerCorner.Parent = ServerBtn
-
-ServerBtn.MouseButton1Click:Connect(function()
-    ServerBtn.Text = "⏳ กำลังค้นหาเซิฟ 1 คน..."
-    ServerBtn.BackgroundColor3 = Color3.fromRGB(241, 196, 15)
     
-    task.spawn(function()
-        local placeId = game.PlaceId
-        local serversUrl = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/0?sortOrder=Asc&limit=100"
-
-        pcall(function()
-            local raw = game:HttpGet(serversUrl)
-            local body = HttpService:JSONDecode(raw)
-
-            if body and body.data then
-                for _, s in ipairs(body.data) do
-                    if s.playing and s.playing <= 1 and s.id ~= game.JobId then
-                        ServerBtn.Text = "🔄 กำลังวาร์ป..."
-                        ServerBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
-                        TeleportService:TeleportToPlaceInstance(placeId, s.id, LocalPlayer)
-                        return
-                    end
-                end
-            end
-            ServerBtn.Text = "❌ ไม่พบเซิฟว่าง ลองแตะใหม่อีกที!"
-            ServerBtn.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
-            task.wait(2)
-            ServerBtn.Text = "🚀 ย้ายไปเซิฟเวอร์ 1 คน (แตะเพื่อย้ายทันที)"
-            ServerBtn.BackgroundColor3 = Color3.fromRGB(155, 89, 182)
-        end)
-    end)
-end)
-
----------------------------------------------------------
--- 5. EVENTS
----------------------------------------------------------
-RunBtn.MouseButton1Click:Connect(function()
-    local userKey = string.gsub(KeyBox.Text, "%s+", "")
-    if userKey == CORRECT_KEY then
-        KeyFrame.Visible = false
-        MainFrame.Visible = true
-        ToggleBtn.Visible = true
-    else
-        RunBtn.Text = "Key ไม่ถูกต้อง! (ทักหาแอดมิน)"
-        RunBtn.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
-        task.wait(1.5)
-        RunBtn.Text = "เข้าสู่ระบบ"
-        RunBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
-    end
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-end)
-
-ToggleBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
+    -- แจ้งเตือนขึ้นว่า คัดลอกลิ้งค์แล้ว!
+    NotifyLabel.Text = "คัดลอกลิ้งค์แล้ว!"
+    task.wait(2)
+    NotifyLabel.Text = ""
 end)
