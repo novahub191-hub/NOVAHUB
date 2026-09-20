@@ -1,29 +1,131 @@
+-- [[ NOVA Hub - Custom UI Edition ]]
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
--- ----------------------------------------------------
--- ระบบชื่อสายรุ้งบนหัว (Brookhaven Rainbow Name Only)
--- ----------------------------------------------------
-task.spawn(function()
-    while true do
-        RunService.RenderStepped:Wait()
-        local character = LocalPlayer.Character
-        if character then
-            local head = character:FindFirstChild("Head")
-            if head then
-                -- ค้นหาป้ายชื่อ RP บนหัวตัวละครใน Brookhaven
-                for _, v in ipairs(head:GetChildren()) do
-                    if v:IsA("BillboardGui") then
-                        for _, label in ipairs(v:GetDescendants()) do
-                            if label:IsA("TextLabel") then
-                                local hue = (tick() % 3) / 3
-                                label.TextColor3 = Color3.fromHSV(hue, 1, 1)
-                            end
-                        end
-                    end
-                end
-            end
+local DISCORD_LINK = "https://discord.gg/678vek3Jh"
+local SHORT_DISCORD_LINK = "discord.gg/678vek3Jh"
+
+-- Safe GUI Parent Setup
+local ParentTarget
+pcall(function()
+    ParentTarget = game:GetService("CoreGui")
+end)
+if not ParentTarget then
+    ParentTarget = LocalPlayer:WaitForChild("PlayerGui")
+end
+
+-- Clear Old UI
+if ParentTarget:FindFirstChild("NOVA_Hub_CustomUI") then
+    ParentTarget.NOVA_Hub_CustomUI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NOVA_Hub_CustomUI"
+ScreenGui.ResetOnSpawn = false
+pcall(function() ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling end)
+ScreenGui.Parent = ParentTarget
+
+---------------------------------------------------------
+-- MAIN KEY FRAME (White Background + Blue Border)
+---------------------------------------------------------
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Name = "KeyFrame"
+KeyFrame.Size = UDim2.new(0, 360, 0, 240)
+KeyFrame.Position = UDim2.new(0.5, -180, 0.5, -120)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- พื้นหลังสีขาว
+KeyFrame.Active = true
+KeyFrame.Draggable = true
+KeyFrame.Parent = ScreenGui
+
+local KeyStroke = Instance.new("UIStroke")
+KeyStroke.Color = Color3.fromRGB(0, 170, 255) -- ขอบสีฟ้า
+KeyStroke.Thickness = 2.5
+KeyStroke.Parent = KeyFrame
+
+local KeyCorner = Instance.new("UICorner")
+KeyCorner.CornerRadius = UDim.new(0, 10)
+KeyCorner.Parent = KeyFrame
+
+-- Title Text: • NOVA Hub - [⏳]
+local KeyTitle = Instance.new("TextLabel")
+KeyTitle.Size = UDim2.new(1, 0, 0, 35)
+KeyTitle.Position = UDim2.new(0, 0, 0, 10)
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Text = "• NOVA Hub - [⏳]"
+KeyTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
+KeyTitle.TextSize = 18
+KeyTitle.Font = Enum.Font.SourceSansBold
+KeyTitle.Parent = KeyFrame
+
+-- Discord Small Link Text
+local DiscSubText = Instance.new("TextLabel")
+DiscSubText.Size = UDim2.new(1, 0, 0, 18)
+DiscSubText.Position = UDim2.new(0, 0, 0, 42)
+DiscSubText.BackgroundTransparency = 1
+DiscSubText.Text = DISCORD_LINK
+DiscSubText.TextColor3 = Color3.fromRGB(150, 150, 150)
+DiscSubText.TextSize = 11 -- ตัวเล็กๆ
+DiscSubText.Font = Enum.Font.SourceSans
+DiscSubText.Parent = KeyFrame
+
+-- Key Input Box (Gray Background)
+local KeyBox = Instance.new("TextBox")
+KeyBox.Size = UDim2.new(0.85, 0, 0, 40)
+KeyBox.Position = UDim2.new(0.075, 0, 0.32, 0)
+KeyBox.BackgroundColor3 = Color3.fromRGB(230, 230, 230) -- ช่องเทาๆ
+KeyBox.PlaceholderText = "[ 🔒 ] Key.."
+KeyBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+KeyBox.Text = ""
+KeyBox.TextColor3 = Color3.fromRGB(255, 0, 0) -- ตัวหนังสือสีแดง
+KeyBox.TextSize = 15
+KeyBox.Font = Enum.Font.SourceSansBold
+KeyBox.Parent = KeyFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 8)
+BoxCorner.Parent = KeyBox
+
+-- แจ้งเตือนเมื่อกดใส่ Key
+KeyBox.Focused:Connect(function()
+    KeyBox.Text = "Script อัพเกมแล้ว!"
+end)
+
+-- Green Follow Script Button
+local FollowBtn = Instance.new("TextButton")
+FollowBtn.Size = UDim2.new(0.85, 0, 0, 42)
+FollowBtn.Position = UDim2.new(0.075, 0, 0.60, 0)
+FollowBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113) -- ปุ่มสีเขียว
+FollowBtn.Text = "ติดตาม Script.."
+FollowBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FollowBtn.TextSize = 16
+FollowBtn.Font = Enum.Font.SourceSansBold
+FollowBtn.Parent = KeyFrame
+
+local FollowCorner = Instance.new("UICorner")
+FollowCorner.CornerRadius = UDim.new(0, 8)
+FollowCorner.Parent = FollowBtn
+
+-- Custom Notification Box
+local NotifyLabel = Instance.new("TextLabel")
+NotifyLabel.Size = UDim2.new(0.85, 0, 0, 20)
+NotifyLabel.Position = UDim2.new(0.075, 0, 0.83, 0)
+NotifyLabel.BackgroundTransparency = 1
+NotifyLabel.Text = ""
+NotifyLabel.TextColor3 = Color3.fromRGB(46, 204, 113)
+NotifyLabel.TextSize = 13
+NotifyLabel.Font = Enum.Font.SourceSansBold
+NotifyLabel.Parent = KeyFrame
+
+-- Action Button Click (Copy Link & Notify)
+FollowBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        if setclipboard then
+            setclipboard(SHORT_DISCORD_LINK)
         end
-    end
+    end)
+    
+    -- แจ้งเตือนขึ้นว่า คัดลอกลิ้งค์แล้ว!
+    NotifyLabel.Text = "คัดลอกลิ้งค์แล้ว!"
+    task.wait(2)
+    NotifyLabel.Text = ""
 end)
